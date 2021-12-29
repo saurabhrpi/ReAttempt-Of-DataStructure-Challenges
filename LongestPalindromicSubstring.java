@@ -1,10 +1,9 @@
 class Solution {    
     // O(N).. Manacher's Algo.
-
     public String longestPalindrome(String s) {
         char[] paddedCharArr = new char[s.length()*2 + 1];
         int[] arrOfOneSideLenInclCenterAtI = new int[paddedCharArr.length];
-        int indexOfCenterOfCurrLongPal = 0, lasIndexCurrLongestPal = 0; // p is the index of last character of the current longest palindrome.
+        int indexOfCenterOfCurrLongPal = 0, lasIndexCurrLongestPal = 0; 
         for(int i = 0; i < s.length(); i++){
             paddedCharArr[2*i+1] = s.charAt(i);
         }
@@ -20,25 +19,33 @@ class Solution {
             System.out.println("indexOfCenterOfCurrLongPal " + indexOfCenterOfCurrLongPal);
             // if index i is outside the bounds of longest palindrome so far, set Len[i] to 1. Else
             // set Len[i] = minimum of the (Len of its mirror image character or its distance from the palindrome's end + 1).            
-            arrOfOneSideLenInclCenterAtI[i] = i < lasIndexCurrLongestPal ?  Math.min(arrOfOneSideLenInclCenterAtI[2*indexOfCenterOfCurrLongPal - i], lasIndexCurrLongestPal-i+1) : 1; 
-            System.out.println("arrOfOneSideLenInclCenterAtI[i] " + arrOfOneSideLenInclCenterAtI[i]);// Length of palindrome centerd at i
+            // If index i is within the currentLongestPal then take min of 
+            // (i's mirror image's arrOfOneSideLenInclCenterAtI value, i's distance from lasIndexCurrLongestPal).
+            // One reason being it's possible the mirror image is center of a previous palindrome, 
+            // thus causing arrOfOneSideLenInclCenterAtI[i] to be > than i's distance from the last char of current palindrome.
+             arrOfOneSideLenInclCenterAtI[i] = i < lasIndexCurrLongestPal ?  
+                 Math.min(arrOfOneSideLenInclCenterAtI[2*indexOfCenterOfCurrLongPal - i], lasIndexCurrLongestPal-i+1) : 1;             
+             System.out.println("arrOfOneSideLenInclCenterAtI[i] " + arrOfOneSideLenInclCenterAtI[i]);// Length of palindrome centerd at i
             
             // Before passing variables as paddedString 's indices, checking for their validity. And then,
             // checking if there is some palindrome of length > 1 centered at index i.
-            while(i-arrOfOneSideLenInclCenterAtI[i] >= 0 && i+arrOfOneSideLenInclCenterAtI[i] < paddedCharArr.length && paddedCharArr[i-arrOfOneSideLenInclCenterAtI[i]] == paddedCharArr[i+arrOfOneSideLenInclCenterAtI[i]])             
+            while(i-arrOfOneSideLenInclCenterAtI[i] >= 0 && i+arrOfOneSideLenInclCenterAtI[i] < paddedCharArr.length && 
+                  paddedCharArr[i-arrOfOneSideLenInclCenterAtI[i]] == paddedCharArr[i+arrOfOneSideLenInclCenterAtI[i]])             
             {
                 System.out.println("inside while");
                 arrOfOneSideLenInclCenterAtI[i]++; // increase and then check again lower and higher indices for palindrome
             }
-            // p-p0+1 below cuz that is same as Len[i] which is one half of palindrome incl. center.
-            if (arrOfOneSideLenInclCenterAtI[i] > lasIndexCurrLongestPal-indexOfCenterOfCurrLongPal+1) { // if the palindrome at index i is > longest Palindrome so far
+
+            if (arrOfOneSideLenInclCenterAtI[i] > lasIndexCurrLongestPal-indexOfCenterOfCurrLongPal+1) { 
                 indexOfCenterOfCurrLongPal = i;  // index of center of longest palindrome so far
-                lasIndexCurrLongestPal = i + arrOfOneSideLenInclCenterAtI[i] - 1; // length of the longest palindrome so far (reducing 1 due to double counting). Len[i] already includes length of palindrom from i onwards. Hence just adding i - 1 to it.
+                lasIndexCurrLongestPal = i + arrOfOneSideLenInclCenterAtI[i] - 1; 
             }
             System.out.println("end of iteration " + i);
         }
         System.out.println("returning " + s.substring((2*indexOfCenterOfCurrLongPal-lasIndexCurrLongestPal)/2, lasIndexCurrLongestPal/2));
-        return s.substring((2*indexOfCenterOfCurrLongPal-lasIndexCurrLongestPal)/2, lasIndexCurrLongestPal/2); // divide by 2 as it's a padded string
+        // divide by 2 as for any index i in original string s, i = newIndex/2. For e.g. 0 == 1/2, 1 == 3/2 and so on. 
+        return s.substring((2*indexOfCenterOfCurrLongPal-lasIndexCurrLongestPal)/2, lasIndexCurrLongestPal/2);  
+        
     }    
 }
     /*
